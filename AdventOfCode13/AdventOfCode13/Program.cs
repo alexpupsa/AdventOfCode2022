@@ -22,7 +22,8 @@ void Part1()
     var index = 1;
     foreach (var pair in pairs)
     {
-        if (AreListsInOrder(pair.Item1, pair.Item2, false))
+        var areListsInOrder = AreListsInOrder(pair.Item1, pair.Item2);
+        if (areListsInOrder.HasValue && areListsInOrder.Value)
         {
             indexSum += index;
             Console.WriteLine(index);
@@ -32,33 +33,45 @@ void Part1()
     Console.WriteLine(indexSum);
 }
 
-static bool AreListsInOrder(string item1, string item2, bool isListConverted)
+static bool? AreListsInOrder(string item1, string item2)
 {
     var list1 = item1.TrimOneCharacter(new char[] { '[', ']' }).SpecialSplit();
     var list2 = item2.TrimOneCharacter(new char[] { '[', ']' }).SpecialSplit();
-    if (!isListConverted && list1.Length > list2.Length) return false;
+    if (list1.Length == list2.Length && list1.Length == 0)
+    {
+        return null;
+    }
     for (int i = 0; i < list1.Length; i++)
     {
-        if (i >= list2.Length) break;
-        isListConverted = false;
+        if (i >= list2.Length) return false;
         if (list1[i].StartsWith("[") || list2[i].StartsWith("["))
         {
             if (!list1[i].StartsWith("["))
             {
                 list1[i] = $"[{list1[i]}]";
-                isListConverted = true;
             }
             if (!list2[i].StartsWith("["))
             {
                 list2[i] = $"[{list2[i]}]";
-                isListConverted = true;
             }
-            var checkLists = AreListsInOrder(list1[i], list2[i], isListConverted);
-            if (!checkLists) return false;
+            var areListInOrder = AreListsInOrder(list1[i], list2[i]);
+            if (areListInOrder.HasValue)
+            {
+                return areListInOrder.Value;
+            }
         }
         else
         {
-            if (int.Parse(list1[i]) > int.Parse(list2[i])) return false;
+            var n1 = int.Parse(list1[i]);
+            var n2 = int.Parse(list2[i]);
+            if (n1 > n2)
+            {
+                return false;
+            }
+            else if (n1 < n2)
+            {
+                return true;
+            }
         }
     }
     return true;
