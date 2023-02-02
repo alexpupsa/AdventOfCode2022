@@ -4,7 +4,7 @@ var lines = File.ReadAllLines("input.txt");
 var pairs = new List<Tuple<string, string>>();
 
 Setup();
-Part1();
+Part2();
 
 void Setup()
 {
@@ -22,8 +22,7 @@ void Part1()
     var index = 1;
     foreach (var pair in pairs)
     {
-        var areListsInOrder = AreListsInOrder(pair.Item1, pair.Item2);
-        if (areListsInOrder.HasValue && areListsInOrder.Value)
+        if (AreListsInOrder(pair.Item1, pair.Item2))
         {
             indexSum += index;
             Console.WriteLine(index);
@@ -33,14 +32,36 @@ void Part1()
     Console.WriteLine(indexSum);
 }
 
-static bool? AreListsInOrder(string item1, string item2)
+void Part2()
+{
+    var items = new List<string>();
+    foreach (var pair in pairs)
+    {
+        items.Add(pair.Item1);
+        items.Add(pair.Item2);
+    }
+    var divider1 = "[[2]]";
+    var divider2 = "[[6]]";
+    var index1 = 1;
+    var index2 = index1 + 1;
+    foreach (var item in items)
+    {
+        if (!AreListsInOrder(divider1, item))
+        {
+            index1++;
+        }
+        if (!AreListsInOrder(divider2, item))
+        {
+            index2++;
+        }
+    }
+    Console.WriteLine($"{index1} * {index2} = {index1 * index2}");
+}
+
+static bool AreListsInOrder(string item1, string item2)
 {
     var list1 = item1.TrimOneCharacter(new char[] { '[', ']' }).SpecialSplit();
     var list2 = item2.TrimOneCharacter(new char[] { '[', ']' }).SpecialSplit();
-    if (list1.Length == list2.Length && list1.Length == 0)
-    {
-        return null;
-    }
     for (int i = 0; i < list1.Length; i++)
     {
         if (i >= list2.Length) return false;
@@ -54,10 +75,9 @@ static bool? AreListsInOrder(string item1, string item2)
             {
                 list2[i] = $"[{list2[i]}]";
             }
-            var areListInOrder = AreListsInOrder(list1[i], list2[i]);
-            if (areListInOrder.HasValue)
+            if (list1[i] != "[]" || list2[i] != "[]")
             {
-                return areListInOrder.Value;
+                return AreListsInOrder(list1[i], list2[i]);
             }
         }
         else
