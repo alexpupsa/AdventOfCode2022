@@ -7,10 +7,10 @@ var cols = 0;
 
 var sandEntryCol = 0;
 
-Setup();
-Part1();
+Setup(true);
+Part2();
 
-void Setup()
+void Setup(bool addFloor = false)
 {
     var points = new List<(int, int)>();
     foreach (var line in lines)
@@ -59,6 +59,15 @@ void Setup()
     cols = maxCol - minCol + 1;
     sandEntryCol = 500 - minCol;
 
+    var shiftCols = 0;
+    if (addFloor)
+    {
+        rows += 2;
+        cols *= 30;
+        shiftCols = cols / 2 - sandEntryCol;
+        sandEntryCol += shiftCols;
+    }
+
     map = new char[rows, cols];
 
     for (var i = 0; i < map.GetLength(0); i++)
@@ -69,6 +78,10 @@ void Setup()
             {
                 map[i, j] = '+';
             }
+            else if (addFloor && i == rows - 1)
+            {
+                map[i, j] = '#';
+            }
             else
             {
                 map[i, j] = '.';
@@ -78,13 +91,12 @@ void Setup()
 
     foreach (var point in points)
     {
-        map[point.Item2, point.Item1 - minCol] = '#';
+        map[point.Item2, point.Item1 - minCol + shiftCols] = '#';
     }
 }
 
 void Part1()
 {
-    PrintMap();
     var sandX = 0;
     var sandY = sandEntryCol;
     var ifInfiniteFall = false;
@@ -137,6 +149,66 @@ void Part1()
         }
     }
     PrintMap();
+    Console.WriteLine(countStillSand);
+}
+
+void Part2()
+{
+    var sandX = 0;
+    var sandY = sandEntryCol;
+    var countStillSand = 0;
+    var isEntryBlocked = false;
+    while (!isEntryBlocked)
+    {
+        if (map[sandX, sandY] == 'x')
+        {
+            map[sandX, sandY] = '.';
+        }
+        var possibleCoords = new List<(int, int)>
+        {
+            (sandX + 1, sandY),
+            (sandX + 1, sandY - 1),
+            (sandX + 1, sandY + 1)
+        };
+
+        var newX = -1;
+        var newY = -1;
+        foreach (var coord in possibleCoords)
+        {
+            if (coord.Item1 >= rows || coord.Item2 < 0 || coord.Item2 >= cols)
+            {
+                break;
+            }
+            if (map[coord.Item1, coord.Item2] == '.')
+            {
+                newX = coord.Item1;
+                newY = coord.Item2;
+                break;
+            }
+        }
+        if (newX >= 0 && newY >= 0)
+        {
+            sandX = newX;
+            sandY = newY;
+            map[sandX, sandY] = 'x';
+        }
+        else
+        {
+            map[sandX, sandY] = 'o';
+            countStillSand++;
+            if (sandX == 0 && sandY == sandEntryCol)
+            {
+                isEntryBlocked = true;
+            }
+            else
+            {
+                sandX = 0;
+                sandY = sandEntryCol;
+            }
+
+        }
+    }
+    //PrintMap();
     Console.WriteLine(countStillSand);
 }
 
