@@ -7,8 +7,8 @@ var cols = 0;
 
 var sandEntryCol = 0;
 
-Setup(true);
-Part2();
+Setup();
+Part1();
 
 void Setup(bool addFloor = false)
 {
@@ -147,6 +147,9 @@ void Part1()
         {
             map[sandX, sandY] = '~';
         }
+        //PrintMap();
+        //Console.ReadKey();
+
     }
     PrintMap();
     Console.WriteLine(countStillSand);
