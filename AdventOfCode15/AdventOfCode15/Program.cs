@@ -4,6 +4,8 @@ var lines = File.ReadAllLines("input.txt");
 
 var sensorBeaconPairs = new List<SignalBeacon>();
 
+var checkedY = 2000000;
+
 Setup();
 Part1();
 
@@ -24,6 +26,25 @@ void Setup()
 
 void Part1()
 {
-    Console.WriteLine(sensorBeaconPairs.Count);
+    var noSensors = new List<(int, int)>();
+    var beaconsOnCheckedLine = new List<(int, int)>();
+    foreach (var pair in sensorBeaconPairs)
+    {
+        var startX = pair.SignalCoords.Item1 - pair.ManhattanDistance;
+        var endX = pair.SignalCoords.Item1 + pair.ManhattanDistance;
+        for (var i = startX; i <= endX; i++)
+        {
+            if (Utils.ManhattanDistance(pair.SignalCoords.Item1, pair.SignalCoords.Item2, i, checkedY) <= pair.ManhattanDistance)
+            {
+                noSensors.Add((i, checkedY));
+            }
+        }
+        if (pair.BeaconCoords.Item2 == checkedY)
+        {
+            beaconsOnCheckedLine.Add(pair.BeaconCoords);
+        }
+    }
+    noSensors = noSensors.Distinct().Where(x => !beaconsOnCheckedLine.Contains(x)).ToList();
+    Console.WriteLine(noSensors.Count);
 }
 
